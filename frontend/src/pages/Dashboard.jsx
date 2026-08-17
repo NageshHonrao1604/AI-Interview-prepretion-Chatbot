@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {
-    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
+    AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
     BarChart, Bar, Cell
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
@@ -136,15 +136,21 @@ const Dashboard = () => {
                             <h3 className="text-lg font-bold text-slate-900 mb-6">Performance Trend</h3>
                             <div className="h-72">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={stats.trend_data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                    <AreaChart data={stats.trend_data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                        <defs>
+                                            <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.15}/>
+                                                <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                                         <XAxis dataKey="date" stroke="#94A3B8" fontSize={12} tickLine={false} />
-                                        <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
+                                        <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} domain={[0, 10]} />
                                         <RechartsTooltip
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                         />
-                                        <Line type="monotone" dataKey="score" stroke="#4F46E5" strokeWidth={3} dot={{ r: 4, fill: '#4F46E5', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
-                                    </LineChart>
+                                        <Area type="monotone" dataKey="score" stroke="#4F46E5" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" dot={{ r: 4, fill: '#4F46E5', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                                    </AreaChart>
                                 </ResponsiveContainer>
                             </div>
                         </motion.div>
@@ -157,6 +163,16 @@ const Dashboard = () => {
                             <div className="h-72">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={stats.category_data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                        <defs>
+                                            <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#06B6D4" />
+                                                <stop offset="100%" stopColor="#0891B2" />
+                                            </linearGradient>
+                                            <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#7C3AED" />
+                                                <stop offset="100%" stopColor="#6D28D9" />
+                                            </linearGradient>
+                                        </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                                         <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} tickLine={false} />
                                         <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} domain={[0, 10]} />
@@ -164,9 +180,9 @@ const Dashboard = () => {
                                             cursor={{ fill: '#F1F5F9' }}
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                         />
-                                        <Bar dataKey="average_score" radius={[6, 6, 0, 0]}>
+                                        <Bar dataKey="average_score" radius={[6, 6, 0, 0]} barSize={45}>
                                             {stats.category_data.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#06B6D4' : '#7C3AED'} />
+                                                <Cell key={`cell-${index}`} fill={index % 2 === 0 ? 'url(#barGrad1)' : 'url(#barGrad2)'} />
                                             ))}
                                         </Bar>
                                     </BarChart>

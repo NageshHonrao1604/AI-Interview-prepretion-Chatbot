@@ -1,585 +1,31 @@
-# import json
-# import random
 
-# # ─────────────────────────────────────────────────────────
-# # QUESTION BANKS — role / category / tier
-# # ─────────────────────────────────────────────────────────
-# BANKS = {
-#   "Software Developer": {
-#     "Technical": {
-#       "basic": [
-#         "What is the difference between a stack and a queue? When would you use each?",
-#         "Explain object-oriented programming and its four core principles.",
-#         "What is the difference between synchronous and asynchronous programming?",
-#         "What is a REST API and how does it work?",
-#         "What is version control and what Git commands do you use most often?",
-#         "What is recursion? Explain with a simple example.",
-#         "What is the difference between an abstract class and an interface?",
-#         "What is a database index and why is it important?",
-#         "Explain what HTTP methods (GET, POST, PUT, DELETE) are used for.",
-#         "What is the difference between == and === in JavaScript?",
-#       ],
-#       "intermediate": [
-#         "How would you design a caching system to improve application performance?",
-#         "Explain the SOLID principles with real examples.",
-#         "When would you choose SQL over NoSQL and why?",
-#         "How do you handle race conditions in concurrent programming?",
-#         "What is dependency injection and how does it improve testability?",
-#         "Explain microservices architecture and its trade-offs vs monolith.",
-#         "How would you implement pagination for a large dataset REST API?",
-#         "What is the difference between horizontal and vertical scaling?",
-#         "How do you approach debugging a production issue with minimal logs?",
-#         "Explain the Observer and Factory design patterns with use-cases.",
-#       ],
-#       "advanced": [
-#         "Design a high-availability system that handles 1 million requests per second.",
-#         "How would you architect a real-time notification system for a social platform?",
-#         "Explain CAP theorem and how you'd design around it.",
-#         "How would you implement a distributed transaction across microservices?",
-#         "Describe implementing a rate limiter for a public API at scale.",
-#         "How would you design a search indexing system for 100 million documents?",
-#         "What is eventual consistency? Give a real-world example.",
-#         "How would you process 10TB of user event data daily?",
-#         "Describe how you'd implement a circuit breaker pattern in production.",
-#         "How would you design a multi-tenant SaaS ensuring data isolation?",
-#       ],
-#     },
-
-#     "HR": {
-#       "basic": [
-#         "Why did you choose software development as a career?",
-#         "How do you stay updated with new technologies?",
-#         "Tell me about a project you're most proud of.",
-#         "How do you handle code review feedback?",
-#         "What kind of development environment do you prefer and why?",
-#       ],
-
-#       "intermediate": [
-#         "Describe a technical disagreement with a teammate. How did you resolve it?",
-#         "How do you manage multiple projects with competing deadlines?",
-#         "Tell me about a time you had to learn a new technology very quickly.",
-#         "How do you explain complex technical concepts to non-technical stakeholders?",
-#         "Describe a situation where you identified and fixed a critical production bug.",
-#       ],
-
-#       "advanced": [
-#         "Tell me about a time you led a team through a major technical migration.",
-#         "How do you mentor junior developers? Give an example of measurable impact.",
-#         "Describe a time you pushed back on a technical decision from leadership.",
-#         "How do you balance technical debt with delivering new features?",
-#         "Tell me about a project you led that failed and what you learned.",
-#       ],
-#     },
-
-#     "Behavioral": {
-#       "basic": [
-#         "Tell me about a challenging coding problem. How did you approach it?",
-#         "How do you handle tight deadlines in development?",
-#         "Describe a situation where you adapted quickly to changing requirements.",
-#         "Give an example of going above and beyond what was expected.",
-#         "How do you prioritize tasks when you have multiple things to work on?",
-#       ],
-
-#       "intermediate": [
-#         "Tell me about a conflict in a development team and how you resolved it.",
-#         "Describe a time you improved a process or workflow in your team.",
-#         "Tell me about working with incomplete or ambiguous requirements.",
-#         "How have you handled a situation where a teammate wasn't contributing?",
-#         "Describe how you responded to and implemented critical feedback.",
-#       ],
-
-#       "advanced": [
-#         "Tell me about the most complex technical project you've worked on.",
-#         "Describe a trade-off you made between code quality and delivery speed.",
-#         "How have you driven adoption of a new technology in your organization?",
-#         "Tell me about a time you influenced stakeholders without direct authority.",
-#         "Describe your most impactful individual contribution to a software project.",
-#       ],
-#     },
-#   },
-# }
-
-# FALLBACK = {
-#     "basic": [
-#         "Can you walk me through your background and main skills?",
-#         "What motivates you in your professional life?",
-#         "How do you approach learning new skills?",
-#         "What would your colleagues say are your greatest strengths?",
-#         "How do you handle working in a fast-paced environment?",
-#     ],
-
-#     "intermediate": [
-#         "Describe a challenging project and your approach to solving it.",
-#         "How do you handle competing priorities and deadlines?",
-#         "Tell me about a conflict with a colleague and how you resolved it.",
-#         "How do you stay updated on industry developments?",
-#         "Describe a process improvement you implemented.",
-#     ],
-
-#     "advanced": [
-#         "What is the highest-impact contribution you've made in your career?",
-#         "Describe how you've influenced organizational strategy or direction.",
-#         "Tell me about leading through significant ambiguity.",
-#         "How do you build trust with new stakeholders quickly?",
-#         "Describe the most complex challenge you've faced and how you resolved it.",
-#     ],
-# }
-
-# # ─────────────────────────────────────────────────────────
-# # HELPER: find the right bank
-# # ─────────────────────────────────────────────────────────
-# def _find_bank(role: str, category: str):
-
-#     role_key = next(
-#         (
-#             k for k in BANKS
-#             if k.lower() in role.lower() or role.lower() in k.lower()
-#         ),
-#         None
-#     )
-
-#     if not role_key:
-#         return None, None
-
-#     cat_key = next(
-#         (
-#             k for k in BANKS[role_key]
-#             if k.lower() in category.lower() or category.lower() in k.lower()
-#         ),
-#         None
-#     )
-
-#     if not cat_key:
-#         cat_key = list(BANKS[role_key].keys())[0]
-
-#     return role_key, cat_key
-
-
-# # ─────────────────────────────────────────────────────────
-# # QUESTION GENERATION
-# # ─────────────────────────────────────────────────────────
-# def generate_interview_question(
-#     role: str,
-#     category: str,
-#     difficulty: str,
-#     question_number: int,
-#     asked_questions: list = None,
-# ) -> str:
-
-#     asked = set(asked_questions or [])
-
-#     # Tier based on question number (1-10)
-#     if question_number <= 3:
-#         tier = "basic"
-#     elif question_number <= 7:
-#         tier = "intermediate"
-#     else:
-#         tier = "advanced"
-
-#     role_key, cat_key = _find_bank(role, category)
-
-#     if role_key and cat_key:
-#         tier_pool = BANKS[role_key][cat_key][tier][:]
-
-#         all_pool = (
-#             BANKS[role_key][cat_key]["basic"]
-#             + BANKS[role_key][cat_key]["intermediate"]
-#             + BANKS[role_key][cat_key]["advanced"]
-#         )
-
-#     else:
-#         tier_pool = FALLBACK[tier][:]
-#         all_pool = (
-#             FALLBACK["basic"]
-#             + FALLBACK["intermediate"]
-#             + FALLBACK["advanced"]
-#         )
-
-#     random.shuffle(tier_pool)
-
-#     for q in tier_pool:
-#         if q not in asked:
-#             return q
-
-#     # Fallback to any tier
-#     random.shuffle(all_pool)
-
-#     for q in all_pool:
-#         if q not in asked:
-#             return q
-
-#     return (
-#         tier_pool[0]
-#         if tier_pool
-#         else f"Describe an advanced challenge you've faced as a {role}."
-#     )
-
-
-# # ─────────────────────────────────────────────────────────
-# # ANSWER EVALUATION
-# # ─────────────────────────────────────────────────────────
-# def evaluate_answer(question: str, answer: str) -> dict:
-
-#     words = answer.split()
-#     word_count = len(words)
-#     a = answer.lower()
-
-#     # ── Depth signals ──
-#     has_example = any(
-#         p in a for p in [
-#             "for example",
-#             "for instance",
-#             "such as",
-#             "like when",
-#             "in my experience",
-#             "i worked on",
-#             "we implemented",
-#             "at my previous",
-#             "in one project",
-#             "i once",
-#         ]
-#     )
-
-#     has_structure = any(
-#         p in a for p in [
-#             "first",
-#             "second",
-#             "third",
-#             "firstly",
-#             "additionally",
-#             "furthermore",
-#             "however",
-#             "therefore",
-#             "in conclusion",
-#             "to summarize",
-#         ]
-#     )
-
-#     tech_hits = sum(
-#         1 for kw in [
-#             "algorithm",
-#             "architect",
-#             "framework",
-#             "pattern",
-#             "database",
-#             "api",
-#             "cache",
-#             "scal",
-#             "perform",
-#             "optim",
-#             "deploy",
-#             "refactor",
-#             "abstract",
-#             "encapsulat",
-#             "inherit",
-#             "polymorph",
-#             "pipeline",
-#             "model",
-#             "metric",
-#             "cluster",
-#             "microservice",
-#         ] if kw in a
-#     )
-
-#     uncertain = any(
-#         p in a for p in [
-#             "i'm not sure",
-#             "i think maybe",
-#             "not really sure",
-#             "i don't know",
-#         ]
-#     )
-
-#     # ── Base score ──
-#     score = 4
-
-#     if word_count >= 100:
-#         score += 3
-#     elif word_count >= 50:
-#         score += 2
-#     elif word_count >= 25:
-#         score += 1
-
-#     if has_example:
-#         score += 1
-
-#     if has_structure:
-#         score += 1
-
-#     score = min(10, max(3, score))
-
-#     # ── Sub-metrics ──
-#     relevance = min(10, max(2, score + (1 if has_example else 0)))
-
-#     technical_accuracy = min(
-#         10,
-#         max(
-#             2,
-#             score + (
-#                 1 if tech_hits >= 3
-#                 else (-1 if tech_hits == 0 else 0)
-#             )
-#         )
-#     )
-
-#     communication = min(
-#         10,
-#         max(2, score + (1 if has_structure else -1))
-#     )
-
-#     confidence = min(
-#         10,
-#         max(
-#             2,
-#             score
-#             + (1 if word_count >= 60 else 0)
-#             - (2 if uncertain else 0)
-#         )
-#     )
-
-#     # ── Strength (specific, varied) ──
-#     strength_opts = []
-
-#     # if has_example:
-#     #     strength_opts.append("Strengthened the answer with a concrete real-world example, which adds credibility and clarity.")
-
-#     # if has_structure:
-#     #     strength_opts.append("Organised thoughts in a logical flow, making the response easy to follow.")
-
-#     # if word_count >= 60:
-#     #     strength_opts.append("Provided a thorough, detailed response demonstrating solid domain understanding.")
-
-#     # if tech_hits >= 2:
-#     #     strength_opts.append("Used precise technical vocabulary, signalling hands-on expertise.")
-
-#     # if not strength_opts:
-#     #     strength_opts.append("Addressed the core of the question with a direct, honest attempt.")
-
-#     # strength = random.choice(strength_opts)
-
-#     if has_example:
-#         strength_opts.append(
-#             "Used practical examples effectively to support the explanation."
-#         )
-
-#     if has_structure:
-#         strength_opts.append(
-#             "Presented the answer in a structured and logical manner."
-#         )
-
-#     if word_count >= 80:
-#         strength_opts.append(
-#             "Demonstrated strong depth of knowledge with detailed explanation."
-#         )
-
-#     if tech_hits >= 3:
-#         strength_opts.append(
-#             "Showed solid technical expertise using relevant concepts and terminology."
-#         )
-
-#     if confidence >= 8:
-#         strength_opts.append(
-#             "Communicated ideas confidently and professionally."
-#         )
-
-#     if communication >= 8:
-#         strength_opts.append(
-#             "Explained concepts clearly with excellent communication clarity."
-#         )
-
-#     if not strength_opts:
-#         strength_opts.append(
-#             "Attempted to answer directly and stayed relevant to the question."
-#         )
-
-#     strength = " | ".join(strength_opts[:2])
-
-#     # ── Weakness (specific, varied) ──
-
-#     # weakness_opts = []
-
-#     # if not has_example:
-#     #     weakness_opts.append("The response would benefit from a specific example or scenario to make the point tangible.")
-
-#     # if not has_structure:
-#     #     weakness_opts.append("The answer lacked structured organisation; a clear beginning, middle, and conclusion would improve impact.")
-
-#     # if word_count < 30:
-#     #     weakness_opts.append("The answer was too brief — a deeper explanation with supporting details is needed.")
-
-#     # if tech_hits == 0 and "technical" in question.lower():
-#     #     weakness_opts.append("The response missed technical depth; incorporating domain-specific concepts would strengthen it significantly.")
-
-#     # if uncertain:
-#     #     weakness_opts.append("Expressing uncertainty without reasoning through it signals low confidence — attempt a structured best-guess instead.")
-
-#     # if not weakness_opts:
-#     #     weakness_opts.append("Consider exploring trade-offs and edge cases to elevate the answer to an expert level.")
-
-#     # weakness = random.choice(weakness_opts)
-
-#     weakness_opts = []
-
-#     if not has_example:
-#         weakness_opts.append(
-#             "Include real-world examples to make the response more convincing."
-#         )
-
-#     if not has_structure:
-#         weakness_opts.append(
-#             "Organize the answer better using a structured approach."
-#         )
-
-#     if word_count < 40:
-#         weakness_opts.append(
-#             "Provide more detailed explanations to demonstrate deeper understanding."
-#         )
-
-#     if tech_hits == 0 and "technical" in question.lower():
-#         weakness_opts.append(
-#             "Add more technical depth and domain-specific concepts."
-#         )
-
-#     if uncertain:
-#         weakness_opts.append(
-#             "Avoid uncertain language and answer with more confidence."
-#         )
-
-#     if confidence < 5:
-#         weakness_opts.append(
-#             "Improve confidence while communicating technical ideas."
-#         )
-
-#     if communication < 5:
-#         weakness_opts.append(
-#             "Focus on clearer communication and concise explanations."
-#         )
-
-#     if not weakness_opts:
-#         weakness_opts.append(
-#             "Explore advanced trade-offs and edge cases for stronger answers."
-#         )
-
-#     weakness = " | ".join(weakness_opts[:2])
-
-#     # ── Improvement tip ──
-#     tips = [
-#         "Use the STAR format (Situation, Task, Action, Result) — it keeps answers structured and memorable.",
-#         "Add a real example: even a one-sentence scenario makes the response far more credible.",
-#         "Quantify your impact (e.g., 'reduced latency by 40%') — numbers are persuasive in interviews.",
-#         "Address trade-offs explicitly; showing awareness of limitations signals senior-level thinking.",
-#         "Explain the 'why' behind your decisions, not just the 'what' — reasoning is what interviewers value most.",
-#     ]
-
-#     if not has_example:
-#         tip = tips[1]
-#     elif not has_structure:
-#         tip = tips[0]
-#     elif word_count < 40:
-#         tip = tips[2]
-#     else:
-#         tip = tips[3]
-
-#     # ── Ideal answer (question-keyed) ──
-#     ideal = _ideal_for(question)
-
-#     return {
-#         "score": score,
-#         "relevance": relevance,
-#         "technical_accuracy": technical_accuracy,
-#         "communication_clarity": communication,
-#         "confidence": confidence,
-#         "strengths": strength,
-#         "weaknesses": weakness,
-#         "suggested_improvement": tip,
-#         "ideal_sample_answer": ideal,
-#     }
-
-
-# # ─────────────────────────────────────────────────────────
-# # IDEAL ANSWER TEMPLATES
-# # ─────────────────────────────────────────────────────────
-# _IDEAL_MAP = {
-
-#     ("stack", "queue"): (
-#         "A stack follows LIFO (Last In, First Out) — like a stack of plates; used for undo/redo or call stacks. "
-#         "A queue follows FIFO (First In, First Out) — like a bank line; used for job scheduling or BFS traversal."
-#     ),
-
-#     ("rest", "api"): (
-#         "REST uses HTTP methods (GET, POST, PUT, DELETE) to operate on resources identified by URLs. "
-#         "The server is stateless — each request carries all needed information. Responses are typically JSON. "
-#         "Example: GET /users returns all users; POST /users creates a new one."
-#     ),
-
-#     ("sql", "nosql"): (
-#         "SQL databases (PostgreSQL, MySQL) use structured schemas and support ACID transactions — ideal for relational data. "
-#         "NoSQL (MongoDB, DynamoDB) is schema-flexible and horizontally scalable — ideal for unstructured or high-throughput data. "
-#         "Choose SQL for financial systems; NoSQL for user profiles or real-time feeds."
-#     ),
-
-#     ("object-oriented", "oop"): (
-#         "OOP rests on four principles: Encapsulation (hide state behind interfaces), Abstraction (expose only what's needed), "
-#         "Inheritance (child classes extend parent behaviour), Polymorphism (same interface, different implementations). "
-#         "Example: a Shape base class with a draw() method overridden differently by Circle and Rectangle."
-#     ),
-
-#     ("microservices",): (
-#         "Microservices split an application into independently deployable services each owning its data. "
-#         "Benefits: independent scaling, tech flexibility, fault isolation. "
-#         "Trade-offs: network overhead, distributed tracing complexity. "
-#         "I've used an API gateway routing to dedicated auth, orders, and payments services."
-#     ),
-
-#     ("solid",): (
-#         "SOLID: Single Responsibility (one reason to change), Open/Closed (extend without modifying), "
-#         "Liskov Substitution (subtypes replace base types safely), Interface Segregation (small, focused interfaces), "
-#         "Dependency Inversion (depend on abstractions). These reduce coupling and aid maintainability."
-#     ),
-
-#     ("a/b test", "ab test"): (
-#         "Define a clear hypothesis, randomly split users into control (A) and variant (B), determine sample size for 95% confidence, "
-#         "measure primary metric + guardrail metrics. Avoid peeking at results before the test ends. "
-#         "Multi-armed bandit is an alternative that dynamically allocates traffic to better-performing variants."
-#     ),
-
-#     ("churn",): (
-#         "Define churn (e.g., 30 days inactive), engineer features (session frequency, feature adoption, support tickets), "
-#         "train a gradient-boosted classifier, validate with cross-validation. "
-#         "Feed high-risk users into a proactive CS outreach playbook and measure its effectiveness with a separate A/B test."
-#     ),
-
-#     ("cap theorem",): (
-#         "CAP states a distributed system can guarantee at most two of: Consistency, Availability, Partition tolerance. "
-#         "Since network partitions are inevitable, you choose between CP (consistent, may be unavailable — e.g., HBase) "
-#         "or AP (available, eventually consistent — e.g., Cassandra). Choose based on your business requirements."
-#     ),
-
-#     ("rate limit",): (
-#         "Implement a token bucket or sliding window algorithm. Store counters in Redis with TTL. "
-#         "For a distributed setup, use Redis Lua scripts for atomic counter updates. "
-#         "Return 429 Too Many Requests with a Retry-After header. Separate limits by API key and endpoint tier."
-#     ),
-# }
-
-
-# def _ideal_for(question: str) -> str:
-
-#     q = question.lower()
-
-#     for keys, answer in _IDEAL_MAP.items():
-#         if all(k in q for k in keys):
-#             return answer
-
-#     return (
-#         "An ideal response: clearly state your approach, support it with a specific example from your experience, "
-#         "explain the outcome or impact, and discuss any trade-offs or lessons learned. "
-#         "The strongest answers demonstrate not just knowledge, but practical application in realistic scenarios."
-#     )
-
+import os
 import json
 import random
+from openai import OpenAI
+import google.generativeai as genai
+from dotenv import load_dotenv
 
+# Load env variables
+load_dotenv()
+
+gemini_key = os.getenv("GEMINI_API_KEY")
+openai_key = os.getenv("OPENAI_API_KEY")
+
+use_gemini = False
+use_openai = False
+api_key = None
+
+if gemini_key:
+    # Use native Google Generative AI SDK
+    genai.configure(api_key=gemini_key)
+    use_gemini = True
+    api_key = gemini_key
+elif openai_key:
+    client = OpenAI(api_key=openai_key)
+    use_openai = True
+    model_name = "gpt-4o-mini"
+    api_key = openai_key
 # ─────────────────────────────────────────────────────────
 # QUESTION BANKS — role / category / tier
 # ─────────────────────────────────────────────────────────
@@ -728,7 +174,56 @@ def generate_interview_question(
     question_number: int,
     asked_questions: list = None,
 ) -> str:
+    # Try native generation with Gemini first
+    if use_gemini:
+        try:
+            asked = asked_questions or []
+            prompt = (
+                f"You are an expert interviewer conducting a mock interview for the role of '{role}'.\n"
+                f"Generate a single, realistic interview question.\n"
+                f"Category: {category} (e.g. Technical, HR, or Behavioral)\n"
+                f"Difficulty level: {difficulty}\n"
+                f"Question Number: {question_number} of 10\n"
+                f"Previously asked questions (do NOT repeat or ask anything similar to these): {json.dumps(asked)}\n\n"
+                f"Respond with ONLY the text of the question. Do not include any greeting, explanation, formatting, markdown, or numbering."
+            )
+            model = genai.GenerativeModel("gemini-flash-latest")
+            response = model.generate_content(prompt)
+            question = response.text.strip()
+            if question:
+                return question
+        except Exception as e:
+            print(f"Gemini native generate_interview_question error: {e}. Trying OpenAI fallback.")
 
+    # Try OpenAI second
+    if use_openai:
+        try:
+            asked = asked_questions or []
+            prompt = (
+                f"You are an expert interviewer conducting a mock interview for the role of '{role}'.\n"
+                f"Generate a single, realistic interview question.\n"
+                f"Category: {category} (e.g. Technical, HR, or Behavioral)\n"
+                f"Difficulty level: {difficulty}\n"
+                f"Question Number: {question_number} of 10\n"
+                f"Previously asked questions (do NOT repeat or ask anything similar to these): {json.dumps(asked)}\n\n"
+                f"Respond with ONLY the text of the question. Do not include any greeting, explanation, formatting, markdown, or numbering."
+            )
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=[
+                    {"role": "system", "content": "You are a professional and technical interviewer."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=150,
+                temperature=0.8
+            )
+            question = response.choices[0].message.content.strip()
+            if question:
+                return question
+        except Exception as e:
+            print(f"OpenAI generate_interview_question error: {e}. Falling back to static pool.")
+
+    # FALLBACK to static local bank
     asked = set(asked_questions or [])
 
     if question_number <= 3:
@@ -771,7 +266,137 @@ def generate_interview_question(
 # ANSWER EVALUATION
 # ─────────────────────────────────────────────────────────
 def evaluate_answer(question: str, answer: str) -> dict:
+    # Try native evaluation with Gemini first
+    if use_gemini:
+        try:
+            prompt = (
+                f"You are an expert interviewer evaluating a candidate's response to an interview question.\n\n"
+                f"Question: {question}\n"
+                f"Candidate's Answer: {answer}\n\n"
+                f"Evaluate the response on the following criteria out of 10:\n"
+                f"- score (overall score out of 10)\n"
+                f"- relevance (out of 10)\n"
+                f"- technical_accuracy (out of 10)\n"
+                f"- communication_clarity (out of 10)\n"
+                f"- confidence (out of 10)\n\n"
+                f"Also provide:\n"
+                f"- strengths (what they did well, format as a concise string)\n"
+                f"- weaknesses (what they missed or can improve, format as a concise string)\n"
+                f"- suggested_improvement (practical steps to make the answer better)\n"
+                f"- ideal_sample_answer (an exemplary sample answer to the question)\n\n"
+                f"You must respond with ONLY a valid JSON object matching the keys exactly."
+            )
+            model = genai.GenerativeModel(
+                "gemini-flash-latest",
+                generation_config={"response_mime_type": "application/json"}
+            )
+            response = model.generate_content(prompt)
+            content = response.text.strip()
+            eval_data = json.loads(content)
+            
+            # Standardize keys to match database model/schemas
+            standard_keys = {
+                "score": 5,
+                "relevance": 5,
+                "technical_accuracy": 5,
+                "communication_clarity": 5,
+                "confidence": 5,
+                "strengths": "",
+                "weaknesses": "",
+                "suggested_improvement": "",
+                "ideal_sample_answer": ""
+            }
+            
+            # Fill in any missing fields with safe default types
+            validated_data = {}
+            for key, default in standard_keys.items():
+                val = eval_data.get(key, default)
+                if isinstance(default, int):
+                    try:
+                        validated_data[key] = int(val)
+                    except (ValueError, TypeError):
+                        validated_data[key] = default
+                else:
+                    validated_data[key] = str(val)
+                    
+            return validated_data
+        except Exception as e:
+            print(f"Gemini native evaluate_answer error: {e}. Trying OpenAI fallback.")
 
+    # Try OpenAI second
+    if use_openai:
+        try:
+            prompt = (
+                f"You are an expert interviewer evaluating a candidate's response to an interview question.\n\n"
+                f"Question: {question}\n"
+                f"Candidate's Answer: {answer}\n\n"
+                f"Evaluate the response on the following criteria out of 10:\n"
+                f"- score (overall score out of 10)\n"
+                f"- relevance (out of 10)\n"
+                f"- technical_accuracy (out of 10)\n"
+                f"- communication_clarity (out of 10)\n"
+                f"- confidence (out of 10)\n\n"
+                f"Also provide:\n"
+                f"- strengths (what they did well, format as a concise string)\n"
+                f"- weaknesses (what they missed or can improve, format as a concise string)\n"
+                f"- suggested_improvement (practical steps to make the answer better)\n"
+                f"- ideal_sample_answer (an exemplary sample answer to the question)\n\n"
+                f"You must respond with ONLY a valid JSON object matching the keys exactly. "
+                f"Do not wrap in ```json or add any explanations outside the JSON."
+            )
+            
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=[
+                    {"role": "system", "content": "You are a precise interviewer. Evaluate candidate answers objectively. Always respond in raw JSON matching the required keys exactly."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=800,
+                temperature=0.3
+            )
+            content = response.choices[0].message.content.strip()
+            
+            # Clean potential markdown wrapping
+            if content.startswith("```"):
+                lines = content.splitlines()
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                content = "\n".join(lines).strip()
+                
+            eval_data = json.loads(content)
+            
+            # Standardize keys to match database model/schemas
+            standard_keys = {
+                "score": 5,
+                "relevance": 5,
+                "technical_accuracy": 5,
+                "communication_clarity": 5,
+                "confidence": 5,
+                "strengths": "",
+                "weaknesses": "",
+                "suggested_improvement": "",
+                "ideal_sample_answer": ""
+            }
+            
+            # Fill in any missing fields with safe default types
+            validated_data = {}
+            for key, default in standard_keys.items():
+                val = eval_data.get(key, default)
+                if isinstance(default, int):
+                    try:
+                        validated_data[key] = int(val)
+                    except (ValueError, TypeError):
+                        validated_data[key] = default
+                else:
+                    validated_data[key] = str(val)
+                    
+            return validated_data
+        except Exception as e:
+            print(f"OpenAI evaluate_answer error: {e}. Falling back to static evaluation.")
+
+    # FALLBACK to static local grading
     words      = answer.split()
     word_count = len(words)
     a          = answer.lower()

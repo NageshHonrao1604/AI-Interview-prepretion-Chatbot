@@ -14,14 +14,16 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="PrepWise AI API")
 
+
+
 import models
 
 models.Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # For dev purposes
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
